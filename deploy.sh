@@ -7,7 +7,5 @@ rm -rf crayfish-js*tgz
 npm install
 npm run build
 
-npm uninstall -g crayfish-js
-npm install -g .
-
 cp package.json dist/framework
+cp README.md dist/framework
