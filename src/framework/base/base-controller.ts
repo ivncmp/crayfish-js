@@ -1,3 +1,4 @@
+import { ControllerRequest, ControllerResponse } from "../types";
 import { Utils } from "../utils";
 
 /**
@@ -21,15 +22,19 @@ export class BaseController {
     /**
      * getAllowedOrigin
      */
-    static getAllowedOrigin(request: GameRequest): string {
+    static getAllowedOrigin(request: ControllerRequest): string | null {
 
-        return request.headers.origin;
+        if (request.headers && request.headers.origin) {
+            return request.headers.origin;
+        }
+
+        return null;
     }
 
     /**
      * response
      */
-    static response(request: GameRequest, status: number, body: any): ControllerResponse {
+    static response(request: ControllerRequest, status: number, body: any): ControllerResponse {
 
         // Build the CORS Headers.
 
@@ -38,16 +43,20 @@ export class BaseController {
 
         // Return the response
 
+        const headers = allowedOrigin ? {
+            "Access-Control-Allow-Credentials": true,
+            "Access-Control-Allow-Methods": "POST, PUT, GET, OPTIONS, DELETE",
+            "Access-Control-Allow-Origin": allowedOrigin,
+            "Access-Control-Allow-Headers": allowedHeaders,
+            "Content-Type": "application/json"
+        } : {
+            "Content-Type": "application/json"
+        };
+
         const response = {
             statusCode: status,
             body: JSON.stringify(body),
-            headers: {
-                "Access-Control-Allow-Credentials": true,
-                "Access-Control-Allow-Methods": "POST, PUT, GET, OPTIONS, DELETE",
-                "Access-Control-Allow-Origin": allowedOrigin,
-                "Access-Control-Allow-Headers": allowedHeaders,
-                "Content-Type": "application/json"
-            }
+            headers: headers
         };
 
         // Return it
@@ -58,7 +67,7 @@ export class BaseController {
     /**
      * typedResponse
      */
-    static typedResponse(request: GameRequest, type: string, status: number, body: any): ControllerResponse {
+    static typedResponse(request: ControllerRequest, type: string, status: number, body: any): ControllerResponse {
 
         // Build the CORS Headers.
 
@@ -67,16 +76,20 @@ export class BaseController {
 
         // Return the response
 
+        const headers = allowedOrigin ? {
+            "Access-Control-Allow-Credentials": true,
+            "Access-Control-Allow-Methods": "POST, PUT, GET, OPTIONS, DELETE",
+            "Access-Control-Allow-Origin": allowedOrigin,
+            "Access-Control-Allow-Headers": allowedHeaders,
+            "Content-Type": "application/json"
+        } : {
+            "Content-Type": "application/json"
+        };
+
         return {
             statusCode: status,
             body: body,
-            headers: {
-                "Access-Control-Allow-Credentials": true,
-                "Access-Control-Allow-Methods": "POST, PUT, GET, OPTIONS, DELETE",
-                "Access-Control-Allow-Origin": allowedOrigin,
-                "Access-Control-Allow-Headers": allowedHeaders,
-                "Content-Type": type
-            }
+            headers: headers
         };
     }
 

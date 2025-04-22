@@ -25,7 +25,7 @@ export enum MetaType {
 // Types
 
 type PendingRoute = { target: Function; propertyKey: string; path: string; method: Method, description: string };
-type Route = { path: string; method: Method; controller: BaseController, handlerName: string, description: string };
+export type Route = { path: string; method: Method; controller: BaseController, handlerName: string, description: string };
 
 // Routes Initalization
 

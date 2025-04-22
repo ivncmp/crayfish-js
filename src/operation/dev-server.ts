@@ -4,6 +4,7 @@
 
 import express, { Request, Response } from 'express';
 import { handleRequest } from '../framework';
+import chalk from 'chalk';
 
 /**
  * processHTTP
@@ -87,6 +88,6 @@ export async function startDevServer() {
 
     app.listen(port, () => {
 
-        console.log(`Started at http://localhost:${port}\n`);
+        console.log(chalk.greenBright(`Started at http://localhost:${port}\n`));
     });
 }

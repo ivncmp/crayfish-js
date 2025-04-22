@@ -1,7 +1,17 @@
+import chalk from "chalk";
 import { execSync } from "child_process";
 
 import * as fs from "fs-extra";
 import * as path from 'path';
+
+function toPascalCase(str: string): string {
+
+    return str
+        .replace(/[-_]+/g, ' ')
+        .replace(/\s(.)/g, function ($1) { return $1.toUpperCase(); })
+        .replace(/\s/g, '')
+        .replace(/^(.)/, function ($1) { return $1.toUpperCase(); });
+}
 
 function executeCmd(command: string, loading: boolean = true) {
 
@@ -43,8 +53,35 @@ export async function initCommand(projectName: string) {
         fs.mkdirSync(projectName);
         process.chdir(projectName);
 
+        const cray = "" +
+            "              *******                                                \n" +
+            "            ***********                                              \n" +
+            "          **+++++********                                            \n" +
+            "           ****+++++++++++++++    ***   **                           \n" +
+            "           ======+++++++*++++++*    **** ****                        \n" +
+            "            =======+++++++++*+****     **  ***                       \n" +
+            "     @@@%     ===++++        ******    ***  ***                      \n" +
+            "         @@@@%                +******************        *****       \n" +
+            "             %@@@@%        ***********************************       \n" +
+            "                 %@@@%@ +*#%#*****************#***#**********        \n" +
+            "                      #******++++*******************************     \n" +
+            "                    ++++++++++++++++++++++++++*++++*++*+++++++++     \n" +
+            "                    %@%*==+#+=======++++++++++*++++*+++==*++++++     \n" +
+            "                @@@@@    =*#+=====++++++++++++*+++*++++++++++        \n" +
+            "           @@@@@@           ====++++++++++++++++++++++ +++++++       \n" +
+            "       %@@@@@                 ======+   +++  ++          +++++       \n" +
+            "     @@@     *********      =======    +++  +++                      \n" +
+            "           *++++********+===++===     +++  +++                       \n" +
+            "             +++*********+=====    +++++ +++                         \n" +
+            "          ======++++++++++=++     ++                                 \n" +
+            "           =======++++++                                             \n" +
+            "             =======+++                                              \n\n";
+
         process.stdout.write("\n");
-        process.stdout.write("Initializing '" + projectName + "' ");
+        process.stdout.write("\n");
+        
+        process.stdout.write(chalk.red(cray));
+        process.stdout.write(chalk.green("Initializing '" + projectName + "' "));
 
         // Build the scaffolding
 
@@ -60,7 +97,7 @@ export async function initCommand(projectName: string) {
         copyTemplate("index.ts", projectPath + "/src");
         copyTemplate("health-controller.ts", projectPath + "/src/controller");
         copyTemplate("health-service.ts", projectPath + "/src/service");
-        copyTemplate("game-types.ts", projectPath + "/src/types");
+        copyTemplate("project-types.ts", projectPath + "/src/types");
 
         // Initialize the NPM Project
 
@@ -91,8 +128,6 @@ export async function initCommand(projectName: string) {
         executeCmd("npm install --save-dev nyc");
         executeCmd("npm install --save-dev sinon");
 
-        executeCmd("npm install /Users/ivan/Development/Sandbox/crayfish-js/dist/framework");
-
         executeCmd(`npm run build`);
 
         console.log("\n\nDone!\n");
@@ -109,14 +144,89 @@ export async function buildCommand(environment: string) {
 
     // Logic to build project
 
-    executeCmd(`npm run build`);
+    executeCmd(`npm run build`, false);
 }
 
-export async function generateCommand(type: string, name: string) {
+export async function generateController(controllerName: string) {
 
-    console.log(`Generating ${type}: ${name}`);
+    // Logic to generate generateController or code snippets
 
-    // Logic to generate files or code snippets
+    try {
+
+        process.stdout.write("\n");
+        process.stdout.write("Creating '" + controllerName + "' ");
+
+        const controllerFile = "src/controller/" + controllerName + "-controller.ts";
+
+        // Copy templates
+
+        copyTemplate("simple-controller.ts", "src/controller");
+
+        executeCmd("mv src/controller/simple-controller.ts " + controllerFile);
+
+        let fileContent = await fs.readFile(controllerFile, 'utf8');
+
+        const replacements = {
+            controllerName: controllerName,
+            controllerClass: toPascalCase(controllerName) + 'Controller',
+            controllerMethod: 'get' + toPascalCase(controllerName)
+        };
+
+        for (const [variable, value] of Object.entries(replacements)) {
+            const regex = new RegExp(`\\$\\{${variable}\\}`, 'g');
+            fileContent = fileContent.replace(regex, value);
+        }
+
+        await fs.writeFile(controllerFile, fileContent, 'utf8');
+
+        executeCmd(`npm run build`);
+
+        console.log("\n\nDone!\n");
+
+    } catch (error) {
+
+        console.error("Failed to generate:", error);
+    }
+}
+
+export async function generateService(serviceName: string) {
+
+    // Logic to generate generateController or code snippets
+
+    try {
+
+        process.stdout.write("\n");
+        process.stdout.write("Creating '" + serviceName + "' ");
+
+        const serviceFile = "src/service/" + serviceName + "-service.ts";
+
+        // Copy templates
+
+        copyTemplate("simple-service.ts", "src/service");
+
+        executeCmd("mv src/service/simple-service.ts " + serviceFile);
+
+        let fileContent = await fs.readFile(serviceFile, 'utf8');
+
+        const replacements = {
+            serviceClass: toPascalCase(serviceName) + 'Service'
+        };
+
+        for (const [variable, value] of Object.entries(replacements)) {
+            const regex = new RegExp(`\\$\\{${variable}\\}`, 'g');
+            fileContent = fileContent.replace(regex, value);
+        }
+
+        await fs.writeFile(serviceFile, fileContent, 'utf8');
+
+        executeCmd(`npm run build`);
+
+        console.log("\n\nDone!\n");
+
+    } catch (error) {
+
+        console.error("Failed to generate:", error);
+    }
 }
 
 export async function startServerCommand(environment: string) {
@@ -132,6 +242,7 @@ export async function startServerCommand(environment: string) {
 
         process.stdout.write("\n");
 
+        executeCmd(`npm run build`, false);
         executeCmd(`npm run start`, false);
 
     } catch (error) {

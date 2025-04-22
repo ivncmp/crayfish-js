@@ -1,9 +1,12 @@
 import { program } from 'commander';
-import { initCommand, buildCommand, startServerCommand } from './commands';
+import {
+    initCommand, buildCommand, startServerCommand,
+    generateController, generateService
+} from './commands';
 
 program
     .version('1.0.0')
-    .description('My Backend Framework CLI');
+    .description('Crayfish-JS Backend Interface.');
 
 program
     .command('init <projectName>')
@@ -22,6 +25,18 @@ program
     .alias('s')
     .description('Starts the development server')
     .action(startServerCommand);
+
+program
+    .command('generate-controller <controller>')
+    .alias('gc')
+    .description('Generates a new Controller')
+    .action(generateController);
+
+program
+    .command('generate-service <service>')
+    .alias('gs')
+    .description('Generates a new Service')
+    .action(generateService);
 
 program.parse(process.argv);
 

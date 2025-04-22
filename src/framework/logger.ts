@@ -1,19 +1,16 @@
-/**
- * LoggerOrigin
- */
-export type LoggerOrigin = any;
+import { LoggerOrigin } from "./types";
 
 /**
- * GameLogger
+ * CrayfishLogger
  */
-export class GameLogger {
+export class CrayfishLogger {
 
     /**
      * info
      */
     static info(origin: LoggerOrigin | undefined, content: any) {
 
-        GameLogger._log(console.info, origin, content);
+        CrayfishLogger._log(console.info, origin, content);
     }
 
     /**
@@ -22,9 +19,9 @@ export class GameLogger {
     static error(origin: LoggerOrigin | undefined, content: any) {
 
         if (content.stack) {
-            GameLogger._log(console.error, origin, content.stack);
+            CrayfishLogger._log(console.error, origin, content.stack);
         } else {
-            GameLogger._log(console.error, origin, content);
+            CrayfishLogger._log(console.error, origin, content);
         }
     }
 
@@ -33,7 +30,7 @@ export class GameLogger {
      */
     static debug(origin: LoggerOrigin | undefined, content: any) {
 
-        GameLogger._log(console.debug, origin, content);
+        CrayfishLogger._log(console.debug, origin, content);
     }
 
     /**

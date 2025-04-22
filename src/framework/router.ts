@@ -1,9 +1,14 @@
 // Route definition
 
 import { BaseController } from "./base/base-controller";
-import { getRouteRegistry, getServiceRegistry } from "./decorator";
-import { GameLogger } from "./game-logger";
+import { getRouteRegistry, Route } from "./decorator";
+import { CrayfishLogger } from "./logger";
+
 import { Utils } from "./utils";
+import {
+    ControllerEvent, ControllerException, ControllerRequest,
+    Environment, ProviderRequest
+} from "./types";
 
 /**
  * matchRouteScore
@@ -35,9 +40,36 @@ function matchRouteScore(currentPathRaw: string, expectedPathRaw: string): numbe
 }
 
 /**
+ * extractPathVariables
+ */
+function extractPathVariables(route: string, url: string): { [key: string]: string } {
+
+    const routeParts = route.split('/').filter(part => part);
+
+    const basePath = url.split('?').filter(part => part);
+    const urlParts = basePath[0].split('/').filter(part => part);
+
+    const vars: { [key: string]: string } = {};
+
+    for (let i = 0; i < routeParts.length; i++) {
+
+        if (routeParts[i].startsWith('{') && routeParts[i].endsWith('}')) {
+
+            const varName = routeParts[i].slice(1, -1);
+
+            if (urlParts[i]) {
+                vars[varName] = urlParts[i];
+            }
+        }
+    }
+
+    return vars;
+}
+
+/**
  * buildRequest
  */
-function buildRequest(event: ControllerEvent): GameRequest {
+function buildRequest(route: Route, event: ControllerEvent): ControllerRequest {
 
     // Request info.
 
@@ -61,29 +93,28 @@ function buildRequest(event: ControllerEvent): GameRequest {
 
     const httpMethod = event.requestContext && event.requestContext.eventType ?
         "SOCKET_" + event.requestContext.eventType : event.httpMethod;
+
     const headers = event.headers;
+
     const queryParameters = event.queryStringParameters ? event.queryStringParameters : {};
+    const pathParameters = extractPathVariables(
+        route.path, event.path);
 
     const clientIp = headers && headers['X-Forwarded-For'] ?
         headers['X-Forwarded-For'] : headers['x-forwarded-for'] ?
             headers['x-forwarded-for'] : "0.0.0.0";
 
-    const getPathElement = (index: number) => {
-        return path[index];
-    };
-
     // Return it.
 
     return {
-        local, path, rawBody, body, headers,
-        httpMethod, queryParameters, domain,
-        clientIp, getPathElement
+        local, rawBody, body, headers, httpMethod,
+        queryParameters, pathParameters, domain, clientIp
     }
 }
 
 // Handle Requests
 
-export async function handleRequest(data: GameRequest) {
+export async function handleRequest(data: ProviderRequest) {
 
     // Request Logic
 
@@ -94,6 +125,12 @@ export async function handleRequest(data: GameRequest) {
     if (data.httpMethod == "OPTIONS") {
         return BaseController.response(data, 200, {});
     }
+
+    // Build Environment
+
+    const environment: Environment = {
+        type: "PRODUCTION"
+    };
 
     // Import Services.
 
@@ -135,12 +172,12 @@ export async function handleRequest(data: GameRequest) {
 
     // Logging 
 
-    GameLogger.info(undefined, "[ Request ] "
+    CrayfishLogger.info(undefined, "[ Request ] "
         + new Date().toISOString() + " | " + data.httpMethod
         + " | " + data.path + " (" + currentRoute.description + ")");
-    GameLogger.info(undefined, "[ Headers ] "
+    CrayfishLogger.info(undefined, "[ Headers ] "
         + new Date().toISOString() + " | Query Parameters: "
-        + JSON.stringify(data.queryStringParameters)
+        + JSON.stringify(data.queryParameters)
         + " | Header Parameters: " + JSON.stringify(data.headers));
 
     // Services Definition.
@@ -156,7 +193,7 @@ export async function handleRequest(data: GameRequest) {
 
     // Format the Request.
 
-    const request = buildRequest(data);
+    const request: ControllerRequest = buildRequest(currentRoute, data);
 
     // Response
 
@@ -180,7 +217,9 @@ export async function handleRequest(data: GameRequest) {
 
             // Get the Controller and make the call.
 
-            responseObject = await controllerInstance[currentRoute.handlerName](request);
+            responseObject = await controllerInstance[
+                currentRoute.handlerName
+            ](request, environment);
 
         } catch (error: ControllerException) {
 
@@ -194,7 +233,7 @@ export async function handleRequest(data: GameRequest) {
 
             } else if (error.message) {
 
-                GameLogger.error(undefined, error);
+                CrayfishLogger.error(undefined, error);
 
                 try {
 
@@ -237,7 +276,7 @@ export async function handleRequest(data: GameRequest) {
 
     } catch (e: ControllerException) {
 
-        GameLogger.error(undefined, e.stack || e);
+        CrayfishLogger.error(undefined, e.stack || e);
 
         return {
             statusCode: 500,
@@ -257,7 +296,7 @@ export async function handleRequest(data: GameRequest) {
             const elapsedTime = Utils.millisecondsToTime(
                 Date.now() - requestStartTime);
 
-            GameLogger.info(undefined, "[ Response ] "
+            CrayfishLogger.info(undefined, "[ Response ] "
                 + elapsedTime + " | " + data.httpMethod + " | " + data.path);
         }
     }

@@ -14,7 +14,6 @@
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "extendedDiagnostics": true,
-        "incremental": true,
         "sourceMap": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
