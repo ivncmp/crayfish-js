@@ -24,8 +24,21 @@ export enum MetaType {
 
 // Types
 
-type PendingRoute = { target: Function; propertyKey: string; path: string; method: Method, description: string };
-export type Route = { path: string; method: Method; controller: BaseController, handlerName: string, description: string };
+type PendingRoute = {
+    target: Function;
+    propertyKey: string;
+    path: string;
+    method: Method,
+    description: string
+};
+
+export type Route = {
+    path: string;
+    method: Method;
+    controller: BaseController,
+    handlerName: string,
+    description: string
+};
 
 // Routes Initalization
 
@@ -33,10 +46,6 @@ const pendingRoutes: PendingRoute[] = [];
 const routeRegistry: Route[] = [];
 const serviceRegistry: { [key: string]: BaseService } = {};
 const injectionRegistry: { [key: string]: string[] } = {};
-
-// Counters
-
-const functionCounter: { [key: string]: number } = {};
 
 /**
  * getTargetKey
@@ -134,28 +143,6 @@ export function Meta(type: MetaType, value: string): MethodDecorator {
 
         }
     };
-}
-
-/**
- * Function Counter Decorator
- */
-export function FunctionCounter(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-
-    const originalMethod = descriptor.value;
-    const targetKey = getTargetKey(target, propertyKey);
-
-    descriptor.value = function (...args: any[]) {
-
-        if (!functionCounter[targetKey]) functionCounter[targetKey] = 0;
-        functionCounter[targetKey]++;
-
-        console.debug("[ Counter ] - "
-            + targetKey + " x" + functionCounter[targetKey]);
-
-        return originalMethod.apply(this, args);
-    };
-
-    return descriptor;
 }
 
 /**

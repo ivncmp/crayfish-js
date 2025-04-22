@@ -76,7 +76,6 @@ function buildRequest(route: Route, event: ControllerEvent): ControllerRequest {
     const local = event.local ? event.local : false;
     const domain = event.requestContext && event.requestContext.domainPrefix
         ? event.requestContext.domainPrefix : "localhost";
-    const path = BaseController.parsePath(event.path);
     const rawBody = event.body;
 
     // Retrieve body data
@@ -128,8 +127,10 @@ export async function handleRequest(data: ProviderRequest) {
 
     // Build Environment
 
-    const environment: Environment = {
-        type: "PRODUCTION"
+    const environment = await Utils.importEnvironment(
+        process.env.ENVIRONMENT || "prod") || {
+        name: "not_found",
+        type: "STAGING"
     };
 
     // Import Services.
@@ -160,7 +161,7 @@ export async function handleRequest(data: ProviderRequest) {
 
     // Choose the best one.
 
-    let currentRoute = matchingRoutes.length > 0
+    const currentRoute = matchingRoutes.length > 0
         ? matchingRoutes[0].route : null;
 
     // Not found
@@ -179,10 +180,6 @@ export async function handleRequest(data: ProviderRequest) {
         + new Date().toISOString() + " | Query Parameters: "
         + JSON.stringify(data.queryParameters)
         + " | Header Parameters: " + JSON.stringify(data.headers));
-
-    // Services Definition.
-
-    // initializeServices();
 
     // Not found
 

@@ -1,8 +1,11 @@
+import _ from "lodash";
+
 import { readdirSync, statSync } from "fs";
 import { join } from "path";
 import { getInjectionRegistry, getServiceRegistry } from "./decorator";
 import { BaseService } from "./base/base-service";
 import { BaseController } from "./base/base-controller";
+import { Environment } from "./types";
 
 export class Utils {
 
@@ -17,6 +20,35 @@ export class Utils {
             + pad((s % 3.6e6) / 6e4 | 0) + ':'
             + pad((s % 6e4) / 1000 | 0) + '.'
             + pad(s % 1000, 3);
+    }
+
+    /**
+     * importEnvironments
+     */
+    static async importEnvironment(target: string, dirPath: string = "./"): Promise<Environment | null> {
+
+        const environments: { [key: string]: Environment } = {};
+
+        const files = readdirSync(dirPath)
+            .filter((f: string) => !f.includes("node_modules"));
+
+        for (const file of files) {
+
+            const filePath = join(dirPath, file);
+            const fileStat = statSync(filePath);
+
+            if (fileStat.isDirectory()) {
+                const found = await Utils.importEnvironment(target, filePath);
+                if (found) return found;
+            } else if (filePath.includes('environment/') && filePath.endsWith('.js')) {
+                const environmentFile = await import(process.cwd() + "/" + filePath);
+                if (environmentFile?.default?.name == target) {
+                    return _.cloneDeep(environmentFile.default);
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

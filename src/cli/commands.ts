@@ -54,13 +54,6 @@ export async function initCommand(projectName: string) {
         process.chdir(projectName);
 
         const cray = "" +
-            "              *******                                                \n" +
-            "            ***********                                              \n" +
-            "          **+++++********                                            \n" +
-            "           ****+++++++++++++++    ***   **                           \n" +
-            "           ======+++++++*++++++*    **** ****                        \n" +
-            "            =======+++++++++*+****     **  ***                       \n" +
-            "     @@@%     ===++++        ******    ***  ***                      \n" +
             "         @@@@%                +******************        *****       \n" +
             "             %@@@@%        ***********************************       \n" +
             "                 %@@@%@ +*#%#*****************#***#**********        \n" +
@@ -69,17 +62,11 @@ export async function initCommand(projectName: string) {
             "                    %@%*==+#+=======++++++++++*++++*+++==*++++++     \n" +
             "                @@@@@    =*#+=====++++++++++++*+++*++++++++++        \n" +
             "           @@@@@@           ====++++++++++++++++++++++ +++++++       \n" +
-            "       %@@@@@                 ======+   +++  ++          +++++       \n" +
-            "     @@@     *********      =======    +++  +++                      \n" +
-            "           *++++********+===++===     +++  +++                       \n" +
-            "             +++*********+=====    +++++ +++                         \n" +
-            "          ======++++++++++=++     ++                                 \n" +
-            "           =======++++++                                             \n" +
-            "             =======+++                                              \n\n";
+            "       %@@@@@                 ======+   +++  ++          +++++       \n\n";
 
         process.stdout.write("\n");
         process.stdout.write("\n");
-        
+
         process.stdout.write(chalk.red(cray));
         process.stdout.write(chalk.green("Initializing '" + projectName + "' "));
 
@@ -88,6 +75,7 @@ export async function initCommand(projectName: string) {
         executeCmd("mkdir src");
         executeCmd("mkdir src/controller");
         executeCmd("mkdir src/service");
+        executeCmd("mkdir src/environment");
         executeCmd("mkdir src/types");
 
         // Copy templates
@@ -98,6 +86,7 @@ export async function initCommand(projectName: string) {
         copyTemplate("health-controller.ts", projectPath + "/src/controller");
         copyTemplate("health-service.ts", projectPath + "/src/service");
         copyTemplate("project-types.ts", projectPath + "/src/types");
+        copyTemplate("prod.ts", projectPath + "/src/environment");
 
         // Initialize the NPM Project
 
@@ -241,9 +230,10 @@ export async function startServerCommand(environment: string) {
         // Run the execution
 
         process.stdout.write("\n");
+        process.env.ENVIRONMENT = environment || "prod";
 
-        executeCmd(`npm run build`, false);
-        executeCmd(`npm run start`, false);
+        executeCmd("npm run build", false);
+        executeCmd("npm run start", false);
 
     } catch (error) {
 
