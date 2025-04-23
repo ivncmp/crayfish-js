@@ -3,8 +3,9 @@
  */
 
 import express, { Request, Response } from 'express';
-import { handleRequest } from '../framework';
 import chalk from 'chalk';
+
+import { handleRequest } from '../router';
 
 /**
  * processHTTP

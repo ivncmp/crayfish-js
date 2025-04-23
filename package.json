@@ -1,17 +1,32 @@
 {
   "name": "crayfish-js",
-  "version": "1.0.0",
+  "version": "1.1.4",
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
     "build": "tsc && ts-node src/tools/prepend-shebang.ts && cp -R templates dist"
   },
   "bin": {
-    "cf": "dist/cli/index.js"
+    "crayfish": "cli/index.js"
   },
-  "author": "https://github.com/ivncmp",
+  "homepage": "https://github.com/ivncmp/crayfish-js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ivncmp/crayfish-js.git"
+  },
+  "author": {
+    "name": "ivncmp",
+    "email": "ivncmp@gmail.com",
+    "url": "https://github.com/ivncmp"
+  },
   "license": "GPL-3.0-only",
   "description": "The easiest Typescript Backend Framework specially built for Serverless.",
+  "keywords": [
+    "Node",
+    "Framework",
+    "Serverless",
+    "Typescript"
+  ],
   "dependencies": {
     "chalk": "^5.4.1",
     "commander": "^13.1.0",

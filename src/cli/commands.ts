@@ -34,7 +34,7 @@ function executeCmd(command: string, loading: boolean = true) {
 function copyTemplate(file: string, pathRoute: string) {
 
     fs.copySync(path.resolve(__dirname,
-        '../../templates/' + file + '.t'),
+        '../templates/' + file + '.t'),
         pathRoute + "/" + file);
 }
 
@@ -53,21 +53,9 @@ export async function initCommand(projectName: string) {
         fs.mkdirSync(projectName);
         process.chdir(projectName);
 
-        const cray = "" +
-            "         @@@@%                +******************        *****       \n" +
-            "             %@@@@%        ***********************************       \n" +
-            "                 %@@@%@ +*#%#*****************#***#**********        \n" +
-            "                      #******++++*******************************     \n" +
-            "                    ++++++++++++++++++++++++++*++++*++*+++++++++     \n" +
-            "                    %@%*==+#+=======++++++++++*++++*+++==*++++++     \n" +
-            "                @@@@@    =*#+=====++++++++++++*+++*++++++++++        \n" +
-            "           @@@@@@           ====++++++++++++++++++++++ +++++++       \n" +
-            "       %@@@@@                 ======+   +++  ++          +++++       \n\n";
-
         process.stdout.write("\n");
         process.stdout.write("\n");
 
-        process.stdout.write(chalk.red(cray));
         process.stdout.write(chalk.green("Initializing '" + projectName + "' "));
 
         // Build the scaffolding
@@ -112,11 +100,12 @@ export async function initCommand(projectName: string) {
         executeCmd("npm install --save-dev @types/xml2js");
         executeCmd("npm install --save-dev body-parser");
         executeCmd("npm install --save-dev chai");
-        executeCmd("npm install --save-dev express");
+        executeCmd("npm install --save-dev express@^4.20.0");
         executeCmd("npm install --save-dev mocha");
         executeCmd("npm install --save-dev nyc");
         executeCmd("npm install --save-dev sinon");
 
+        executeCmd("npm install crayfish-js");
         executeCmd(`npm run build`);
 
         console.log("\n\nDone!\n");

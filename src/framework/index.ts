@@ -6,4 +6,4 @@ export * from './router';
 export * from './types';
 export * from './base/base-controller';
 export * from './base/base-service';
-export * from '../operation/dev-server';
+export * from './operation/dev-server';

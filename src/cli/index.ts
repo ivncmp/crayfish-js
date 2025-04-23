@@ -5,7 +5,7 @@ import {
 } from './commands';
 
 program
-    .version('1.0.0')
+    .version('1.1.4')
     .description('Crayfish-JS Backend Interface.');
 
 program
