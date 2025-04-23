@@ -31,7 +31,6 @@
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "fs-extra": "^11.3.0",
-    "inquirer": "^12.5.2",
     "lodash": "~4.17.21",
     "reflect-metadata": "^0.2.2"
   },

@@ -1,7 +1,7 @@
 import { program } from 'commander';
 import {
     initCommand, buildCommand, startServerCommand,
-    generateController, generateService
+    generateController, generateService, packCommand
 } from './commands';
 
 program
@@ -19,6 +19,12 @@ program
     .alias('b')
     .description('Build the project')
     .action(buildCommand);
+
+program
+    .command('pack <environment>')
+    .alias('p')
+    .description('Pack the project for deployment')
+    .action(packCommand);
 
 program
     .command('start-server <environment>')

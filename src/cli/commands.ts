@@ -13,13 +13,13 @@ function toPascalCase(str: string): string {
         .replace(/^(.)/, function ($1) { return $1.toUpperCase(); });
 }
 
-function executeCmd(command: string, loading: boolean = true) {
+function executeCmd(command: string, stdio: string = "pipe", loading: boolean = true) {
 
     process.stdout.write(loading ? "." : "");
 
     try {
 
-        execSync(command, { stdio: loading ? "pipe" : "inherit" });
+        execSync(command, { stdio: stdio as any });
 
     } catch (error) {
 
@@ -53,10 +53,7 @@ export async function initCommand(projectName: string) {
         fs.mkdirSync(projectName);
         process.chdir(projectName);
 
-        process.stdout.write("\n");
-        process.stdout.write("\n");
-
-        process.stdout.write(chalk.green("Initializing '" + projectName + "' "));
+        process.stdout.write(chalk.bold(chalk.blueBright(`\nInitializing '${projectName}' `)));
 
         // Build the scaffolding
 
@@ -89,7 +86,7 @@ export async function initCommand(projectName: string) {
         packageJson.scripts.build = "tsc";
         packageJson.scripts.start = "node --no-warnings src/index.ts";
 
-        fs.writeJsonSync(packageJsonPath, packageJson, { spaces: 2 });
+        fs.writeJsonSync(packageJsonPath, packageJson, { spaces: 4 });
 
         // Download dev dependencies
 
@@ -106,9 +103,15 @@ export async function initCommand(projectName: string) {
         executeCmd("npm install --save-dev sinon");
 
         executeCmd("npm install crayfish-js");
-        executeCmd(`npm run build`);
 
-        console.log("\n\nDone!\n");
+        executeCmd("npm run build", "pipe", false);
+
+        // Done
+
+        process.stdout.write("\n");
+        process.stdout.write(chalk.green("Done!"));
+        process.stdout.write("\n");
+        process.stdout.write("\n");
 
     } catch (error) {
 
@@ -118,11 +121,84 @@ export async function initCommand(projectName: string) {
 
 export async function buildCommand(environment: string) {
 
-    console.log(`Building ... ${environment}`);
+    process.stdout.write(chalk.bold(chalk.blueBright(`\nBuilding ${environment} environment...`)));
 
     // Logic to build project
 
-    executeCmd(`npm run build`, false);
+    executeCmd(`npm run build`, "pipe", false);
+
+    // Done
+
+    process.stdout.write("\n");
+    process.stdout.write(chalk.green("Done!"));
+    process.stdout.write("\n");
+    process.stdout.write("\n");
+}
+
+export async function packCommand(environment: string) {
+
+    process.stdout.write(chalk.bold(chalk.blueBright(`\nPacking ${environment} environment...`)));
+
+    // Logic to build project
+
+    executeCmd(`rm -rf out`, "pipe", false);
+    executeCmd(`rm -rf dist`, "pipe", false)
+
+    // Dynamically remove the source map
+
+    try {
+
+        const tsconfigJsonPath = path.join(path.resolve(''), 'tsconfig.json');
+        const tsconfigJson = fs.readJsonSync(tsconfigJsonPath);
+
+        tsconfigJson.compilerOptions.sourceMap = false;
+        fs.writeJsonSync(tsconfigJsonPath, tsconfigJson, { spaces: 4 });
+
+    } catch (error) { return; }
+
+    // Build
+
+    executeCmd(`npm run build`, "pipe", false);
+
+    executeCmd(`mv out dist`, "pipe", false);
+    executeCmd(`rm -rf dist/index.js`, "pipe", false);
+
+    // Dynamically add the source map
+
+    try {
+
+        const tsconfigJsonPath = path.join(path.resolve(''), 'tsconfig.json');
+        const tsconfigJson = fs.readJsonSync(tsconfigJsonPath);
+
+        tsconfigJson.compilerOptions.sourceMap = true;
+        fs.writeJsonSync(tsconfigJsonPath, tsconfigJson, { spaces: 4 });
+
+    } catch (error) { return; }
+
+    // Build
+
+    executeCmd(`npm run build`, "pipe", false);
+
+    // Copy templates
+
+    copyTemplate("handler.js", path.resolve('') + "/dist");
+    executeCmd(`mv dist/handler.js dist/index.js`, "pipe", false);
+
+    // Do the zipfile
+
+    executeCmd(`cd dist && zip -q -r build.zip .`, "pipe", false);
+
+    // Done
+
+    process.stdout.write("\n\n");
+    process.stdout.write("Distribution package located at " +
+        chalk.green(path.resolve('') + "/dist"));
+    process.stdout.write("\n");
+    process.stdout.write("Build Compressed file located at " +
+        chalk.green(path.resolve('') + "/dist/build.zip"));
+    process.stdout.write("\n\n");
+    process.stdout.write(chalk.green("Done!"));
+    process.stdout.write("\n\n");
 }
 
 export async function generateController(controllerName: string) {
@@ -157,9 +233,14 @@ export async function generateController(controllerName: string) {
 
         await fs.writeFile(controllerFile, fileContent, 'utf8');
 
-        executeCmd(`npm run build`);
+        executeCmd("npm run build", "pipe", false);
 
-        console.log("\n\nDone!\n");
+        // Done
+
+        process.stdout.write("\n");
+        process.stdout.write(chalk.green("Done!"));
+        process.stdout.write("\n");
+        process.stdout.write("\n");
 
     } catch (error) {
 
@@ -197,9 +278,14 @@ export async function generateService(serviceName: string) {
 
         await fs.writeFile(serviceFile, fileContent, 'utf8');
 
-        executeCmd(`npm run build`);
+        executeCmd("npm run build", "pipe", false);
 
-        console.log("\n\nDone!\n");
+        // Done
+
+        process.stdout.write("\n");
+        process.stdout.write(chalk.green("Done!"));
+        process.stdout.write("\n");
+        process.stdout.write("\n");
 
     } catch (error) {
 
@@ -221,8 +307,8 @@ export async function startServerCommand(environment: string) {
         process.stdout.write("\n");
         process.env.ENVIRONMENT = environment || "prod";
 
-        executeCmd("npm run build", false);
-        executeCmd("npm run start", false);
+        executeCmd("npm run build", "pipe", false);
+        executeCmd("npm run start", "inherit", false);
 
     } catch (error) {
 

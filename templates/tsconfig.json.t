@@ -16,7 +16,7 @@
         "extendedDiagnostics": true,
         "sourceMap": true,
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
+        "emitDecoratorMetadata": true
     },
     "include": [
         "src"
