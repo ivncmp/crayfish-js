@@ -1,5 +1,7 @@
 # crayfish-js
 
+![CrayfishJS](https://i.ibb.co/HDbbkMHx/logo.png)
+
 The easiest Typescript Backend Framework specially built for Serverless.
 
 ## Installation
@@ -18,7 +20,14 @@ crayfish init your-project-name
 
 ```bash
 cd your-project-name
-crayfish start-server prod
+crayfish start-server production
+```
+
+## Generate distribution package
+
+```bash
+cd your-project-name
+crayfish pack
 ```
 
 ## Create components
