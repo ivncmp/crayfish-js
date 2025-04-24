@@ -1,13 +1,14 @@
 // Route definition
 
+import { setEnvironment } from "./environment";
 import { BaseController } from "./base/base-controller";
 import { getRouteRegistry, Route } from "./decorator";
 import { CrayfishLogger } from "./logger";
-
 import { Utils } from "./utils";
+
 import {
     ControllerEvent, ControllerException, ControllerRequest,
-    Environment, ProviderRequest
+    ProviderRequest
 } from "./types";
 
 /**
@@ -133,6 +134,8 @@ export async function handleRequest(data: ProviderRequest) {
         type: "STAGING"
     };
 
+    setEnvironment(environment);
+
     // Import Services.
 
     await Utils.importServices();
@@ -178,7 +181,7 @@ export async function handleRequest(data: ProviderRequest) {
         + " | " + data.path + " (" + currentRoute.description + ")");
     CrayfishLogger.info(undefined, "[ Headers ] "
         + new Date().toISOString() + " | Query Parameters: "
-        + JSON.stringify(data.queryParameters)
+        + JSON.stringify(data.queryStringParameters)
         + " | Header Parameters: " + JSON.stringify(data.headers));
 
     // Not found
@@ -214,9 +217,7 @@ export async function handleRequest(data: ProviderRequest) {
 
             // Get the Controller and make the call.
 
-            responseObject = await controllerInstance[
-                currentRoute.handlerName
-            ](request, environment);
+            responseObject = await controllerInstance[currentRoute.handlerName](request);
 
         } catch (error: ControllerException) {
 

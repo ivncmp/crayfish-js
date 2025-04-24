@@ -21,7 +21,7 @@ program
     .action(buildCommand);
 
 program
-    .command('pack <environment>')
+    .command('pack')
     .alias('p')
     .description('Pack the project for deployment')
     .action(packCommand);

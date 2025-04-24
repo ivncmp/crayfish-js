@@ -1,4 +1,4 @@
-import { 
+import {
     Service, BaseService, ControllerRequest
 } from "crayfish-js";
 
@@ -8,8 +8,9 @@ export class HealthService extends BaseService {
     /**
      * getHealth
      */
-    async getHealth(request: ControllerRequest) {
+    getHealth(request: ControllerRequest): string {
 
-        return { request }
+        return "This is a " + request.httpMethod +
+            " call to " + request.headers.host;
     }
 }

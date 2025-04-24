@@ -5,7 +5,7 @@ import { join } from "path";
 import { getInjectionRegistry, getServiceRegistry } from "./decorator";
 import { BaseService } from "./base/base-service";
 import { BaseController } from "./base/base-controller";
-import { Environment } from "./types";
+import { Environment } from "./environment";
 
 export class Utils {
 
@@ -27,8 +27,6 @@ export class Utils {
      */
     static async importEnvironment(target: string, dirPath: string = "./"): Promise<Environment | null> {
 
-        const environments: { [key: string]: Environment } = {};
-
         const files = readdirSync(dirPath)
             .filter((f: string) => !f.includes("node_modules"));
 
@@ -40,7 +38,7 @@ export class Utils {
             if (fileStat.isDirectory()) {
                 const found = await Utils.importEnvironment(target, filePath);
                 if (found) return found;
-            } else if (filePath.includes('environment/') && filePath.endsWith('.js')) {
+            } else if (filePath.includes('environments/') && filePath.endsWith('.js')) {
                 const environmentFile = await import(process.cwd() + "/" + filePath);
                 if (environmentFile?.default?.name == target) {
                     return _.cloneDeep(environmentFile.default);

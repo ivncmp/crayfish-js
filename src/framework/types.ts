@@ -23,8 +23,3 @@ export type ControllerException = any;
 export type ControllerEvent = any;
 
 export type LoggerOrigin = any;
-
-export type Environment = {
-    name: string,
-    type: "PRODUCTION" | "STAGING" | "LOCAL"
-};

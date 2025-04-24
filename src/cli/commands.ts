@@ -60,7 +60,7 @@ export async function initCommand(projectName: string) {
         executeCmd("mkdir src");
         executeCmd("mkdir src/controller");
         executeCmd("mkdir src/service");
-        executeCmd("mkdir src/environment");
+        executeCmd("mkdir src/environments");
         executeCmd("mkdir src/types");
 
         // Copy templates
@@ -68,10 +68,12 @@ export async function initCommand(projectName: string) {
         copyTemplate("tsconfig.json", projectPath);
         copyTemplate(".gitignore", projectPath);
         copyTemplate("index.ts", projectPath + "/src");
+        copyTemplate("environment.ts", projectPath + "/src");
         copyTemplate("health-controller.ts", projectPath + "/src/controller");
         copyTemplate("health-service.ts", projectPath + "/src/service");
         copyTemplate("project-types.ts", projectPath + "/src/types");
-        copyTemplate("prod.ts", projectPath + "/src/environment");
+        copyTemplate("production.ts", projectPath + "/src/environments");
+        copyTemplate("staging.ts", projectPath + "/src/environments");
 
         // Initialize the NPM Project
 
@@ -135,9 +137,9 @@ export async function buildCommand(environment: string) {
     process.stdout.write("\n");
 }
 
-export async function packCommand(environment: string) {
+export async function packCommand() {
 
-    process.stdout.write(chalk.bold(chalk.blueBright(`\nPacking ${environment} environment...`)));
+    process.stdout.write(chalk.bold(chalk.blueBright(`\nPacking project for deployment...`)));
 
     // Logic to build project
 

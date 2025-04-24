@@ -1,10 +1,11 @@
 import {
-    Controller, Endpoint, Meta, MetaType, Method, 
-    BaseController, Inject, ControllerRequest, 
-    Environment
+    Controller, Endpoint, Meta, MetaType, Method,
+    BaseController, Inject, ControllerRequest,
+    getEnvironment
 } from "crayfish-js";
 
 import { HealthService } from "../service/health-service";
+import { ProjectEnvironment } from "../environment";
 
 @Controller("/health")
 export class HealthController extends BaseController {
@@ -13,16 +14,17 @@ export class HealthController extends BaseController {
 
     @Meta(MetaType.DESCRIPTION, "Main Health Endpoint")
     @Endpoint(Method.GET, "/")
-    async getHealth(request: ControllerRequest, environment: Environment) {
+    async getHealth(request: ControllerRequest) {
 
-        const health = await this.healthService.getHealth(request);
+        const environment = getEnvironment() as ProjectEnvironment;
+        const health = this.healthService.getHealth(request);
 
         // Return
 
         return {
             code: "OK",
-            health: health,
-            environment: environment
+            environment: environment.toString(),
+            health: health
         };
     }
 }
