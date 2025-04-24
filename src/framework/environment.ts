@@ -6,6 +6,10 @@ export type EnvironmentType = "PRODUCTION" | "STAGING" | "LOCAL";
 
 export class Environment {
 
+    projectName: string = "Project Name";
+    projectDescription: string = "This is the sample project description.";
+    projectVersion: string = "1.0.0";
+
     name: string;
     type: EnvironmentType;
 
@@ -13,6 +17,11 @@ export class Environment {
 
         this.name = _name;
         this.type = _type;
+    }
+
+    static default() {
+
+        return new Environment("not_found", "STAGING");
     }
 };
 

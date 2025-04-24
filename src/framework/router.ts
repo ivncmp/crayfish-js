@@ -1,6 +1,6 @@
 // Route definition
 
-import { setEnvironment } from "./environment";
+import { Environment, setEnvironment } from "./environment";
 import { BaseController } from "./base/base-controller";
 import { getRouteRegistry, Route } from "./decorator";
 import { CrayfishLogger } from "./logger";
@@ -129,10 +129,7 @@ export async function handleRequest(data: ProviderRequest) {
     // Build Environment
 
     const environment = await Utils.importEnvironment(
-        process.env.ENVIRONMENT || "prod") || {
-        name: "not_found",
-        type: "STAGING"
-    };
+        process.env.ENVIRONMENT || "prod") || Environment.default();
 
     setEnvironment(environment);
 
@@ -166,6 +163,12 @@ export async function handleRequest(data: ProviderRequest) {
 
     const currentRoute = matchingRoutes.length > 0
         ? matchingRoutes[0].route : null;
+
+    // API Documentation
+
+    if (!currentRoute && data.path == "/") {
+        return BaseController.documentation(data);
+    }
 
     // Not found
 

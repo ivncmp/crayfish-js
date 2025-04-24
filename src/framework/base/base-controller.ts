@@ -1,5 +1,7 @@
-import { ControllerRequest, ControllerResponse } from "../types";
+import { getRouteRegistry } from "../decorator";
+import { ControllerHttpMethod, ControllerRequest, ControllerResponse } from "../types";
 import { Utils } from "../utils";
+import { generateSwagger, SwaggerEndpoint } from "../utils/swagger";
 
 /**
  * Basic controller.
@@ -100,5 +102,39 @@ export class BaseController {
 
         const urlBase = path.split("#")[0].split("?")[0];
         return urlBase.split("/").filter(p => p.length > 0);
+    }
+
+    /**
+     * parsePath
+     */
+    static documentation(request: ControllerRequest) {
+
+        // Extract the routes
+
+        const routes: SwaggerEndpoint[] = [];
+
+        for (const route of getRouteRegistry()) {
+
+            // Find the base path
+
+            const controller = route.controller;
+            const controllerName = controller.constructor.name;
+            const tag = controllerName + " Services";
+            const description = route.description;
+            const method = route.method.toUpperCase() as ControllerHttpMethod;
+            const path = route.path;
+
+            // Include it in the list.
+
+            routes.push({ tag, method, path, description });
+        }
+
+        // Generate the Swagger
+
+        const swagger = generateSwagger(routes);
+
+        // Return it.
+
+        return BaseController.response(request, 200, swagger);
     }
 }
