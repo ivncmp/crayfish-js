@@ -1,6 +1,6 @@
 {
   "name": "crayfish-js",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
@@ -39,8 +39,8 @@
     "@types/fs-extra": "^11.0.4",
     "@types/lodash": "^4.17.16",
     "@types/node": "^22.14.0",
-    "express": "^4.20.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "express": "^4.20.0"
   }
 }

@@ -144,7 +144,10 @@ export async function packCommand() {
     // Logic to build project
 
     executeCmd(`rm -rf out`, "pipe", false);
-    executeCmd(`rm -rf dist`, "pipe", false)
+    executeCmd(`rm -rf dist`, "pipe", false);
+
+    executeCmd(`rm -rf node_modules`, "pipe", false);
+    executeCmd(`npm install --dev`, "pipe", false);
 
     // Dynamically remove the source map
 
@@ -161,8 +164,12 @@ export async function packCommand() {
     // Build
 
     executeCmd(`npm run build`, "pipe", false);
-
     executeCmd(`mv out dist`, "pipe", false);
+
+    executeCmd(`rm -rf node_modules`, "pipe", false);
+    executeCmd(`npm install --production`, "pipe", false);
+    executeCmd(`mv node_modules dist`, "pipe", false);
+
     executeCmd(`rm -rf dist/index.js`, "pipe", false);
 
     // Dynamically add the source map
@@ -179,6 +186,7 @@ export async function packCommand() {
 
     // Build
 
+    executeCmd(`npm install --dev`, "pipe", false);
     executeCmd(`npm run build`, "pipe", false);
 
     // Copy templates
