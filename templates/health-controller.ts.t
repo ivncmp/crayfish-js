@@ -18,13 +18,15 @@ export class HealthController extends BaseController {
 
         const environment = getEnvironment() as ProjectEnvironment;
         const health = this.healthService.getHealth(request);
+        const user = await this.getAuthenticatedUser(request);
 
         // Return
 
         return {
             code: "OK",
             environment: environment.toString(),
-            health: health
+            health: health,
+            user: user
         };
     }
 }
