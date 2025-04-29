@@ -135,6 +135,10 @@ export async function handleRequest(data: ProviderRequest) {
 
     // Import Services.
 
+    await Utils.importModels();
+
+    // Import Services.
+
     await Utils.importServices();
 
     // Import Controllers.

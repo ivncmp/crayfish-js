@@ -50,6 +50,27 @@ export class Utils {
     }
 
     /**
+     * importModels
+     */
+    static async importModels(dirPath: string = "./") {
+
+        const files = readdirSync(dirPath)
+            .filter((f: string) => !f.includes("node_modules"));
+
+        for (const file of files) {
+
+            const filePath = join(dirPath, file);
+            const fileStat = statSync(filePath);
+
+            if (fileStat.isDirectory()) {
+                await Utils.importModels(filePath);
+            } else if (filePath.includes('model/') && filePath.endsWith('.js')) {
+                await import(process.cwd() + "/" + filePath);
+            }
+        }
+    }
+
+    /**
      * importServices
      */
     static async importServices(dirPath: string = "./") {

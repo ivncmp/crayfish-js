@@ -18,7 +18,9 @@ export class HealthController extends BaseController {
 
         const environment = getEnvironment() as ProjectEnvironment;
         const health = this.healthService.getHealth(request);
-        const user = await this.getAuthenticatedUser(request);
+
+        const user = await this.getAuthenticationService()
+            .authenticateToken(request);
 
         // Return
 

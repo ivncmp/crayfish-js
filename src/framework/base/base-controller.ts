@@ -1,6 +1,6 @@
-import { Authentication } from "../authentication";
-import { getRouteRegistry } from "../decorator";
-import { User } from "../model/user-model";
+import { getModelRegistry, getRouteRegistry } from "../decorator";
+import { BaseUser, BaseUserModel } from "../base/base-user-model";
+import { AuthenticationService } from "../service/authentication-service";
 import { ControllerHttpMethod, ControllerRequest, ControllerResponse } from "../types";
 import { Utils } from "../utils";
 import { generateSwagger, SwaggerEndpoint } from "../utils/swagger";
@@ -10,8 +10,13 @@ import { generateSwagger, SwaggerEndpoint } from "../utils/swagger";
  */
 export class BaseController {
 
-    private authentication: Authentication;
+    // Authentication Service bundled in the Controllers.
 
+    private authenticationService: AuthenticationService;
+
+    /**
+     * BaseController constructor
+     */
     constructor() {
 
         // Inject the dependencies
@@ -20,7 +25,15 @@ export class BaseController {
 
         // Initialize the authentication.
 
-        this.authentication = new Authentication();
+        const baseUserModel = Object.values(getModelRegistry())
+            .find((c: any) => c.isUserModel()) as BaseUserModel;
+
+        if (baseUserModel) {
+            this.authenticationService = new AuthenticationService(baseUserModel);
+        } else {
+            class MockUserModel extends BaseUserModel { }
+            this.authenticationService = new AuthenticationService(new MockUserModel());
+        }
     }
 
     /**
@@ -149,10 +162,10 @@ export class BaseController {
     }
 
     /**
-     * getAuthenticatedUser
+     * getAuthenticationService
      */
-    async getAuthenticatedUser(request: ControllerRequest): Promise<User | null> {
+    getAuthenticationService(): AuthenticationService {
 
-        return this.authentication.authenticateToken(request);
+        return this.authenticationService
     }
 }

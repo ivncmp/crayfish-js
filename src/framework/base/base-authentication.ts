@@ -1,4 +1,4 @@
-import { User } from "../model/user-model";
+import { BaseUser } from "../base/base-user-model";
 import { ControllerRequest } from "../types";
 
 /**
@@ -6,7 +6,7 @@ import { ControllerRequest } from "../types";
  */
 export interface BaseAuthentication {
 
-    login(request: ControllerRequest): Promise<{ user: User, token: string }>;
+    login(request: ControllerRequest): Promise<{ user: BaseUser, token: string }>;
 
-    authenticateToken(request: ControllerRequest): Promise<User | null>;
+    authenticateToken(request: ControllerRequest): Promise<BaseUser | null>;
 };

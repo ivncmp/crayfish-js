@@ -4,6 +4,7 @@ import 'reflect-metadata';
 
 import { BaseController } from './base/base-controller';
 import { BaseService } from './base/base-service';
+import { BaseModel } from './base/base-model';
 
 // Types
 
@@ -44,6 +45,7 @@ export type Route = {
 
 const pendingRoutes: PendingRoute[] = [];
 const routeRegistry: Route[] = [];
+const modelRegistry: { [key: string]: BaseModel } = {};
 const serviceRegistry: { [key: string]: BaseService } = {};
 const injectionRegistry: { [key: string]: string[] } = {};
 
@@ -53,6 +55,16 @@ const injectionRegistry: { [key: string]: string[] } = {};
 function getTargetKey(target: any, propertyKey: any) {
 
     return target.constructor.name + "." + propertyKey.toString();
+}
+
+/**
+ * Model Decorator
+ */
+export function Model(): ClassDecorator {
+
+    return (target: any) => {
+        modelRegistry[target.name] = new target();
+    };
 }
 
 /**
@@ -172,6 +184,14 @@ export function Inject(): PropertyDecorator {
 export function getRouteRegistry() {
 
     return routeRegistry;
+}
+
+/**
+ * getModelRegistry
+ */
+export function getModelRegistry() {
+
+    return modelRegistry;
 }
 
 /**
