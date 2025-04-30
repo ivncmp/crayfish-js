@@ -6,7 +6,24 @@ import {
 @Controller("/auth")
 export class AuthController extends BaseController {
 
-    @Meta(MetaType.DESCRIPTION, "Main Health Endpoint")
+    @Meta(MetaType.DESCRIPTION, "Register Endpoint")
+    @Endpoint(Method.POST, "/register")
+    async register(request: ControllerRequest) {
+
+        // Perform the authentication
+
+        const user = await super.getAuthenticationService()
+            .register(request);
+
+        // Return
+
+        return {
+            code: "OK",
+            user: user
+        };
+    }
+
+    @Meta(MetaType.DESCRIPTION, "Login Endpoint")
     @Endpoint(Method.POST, "/login")
     async login(request: ControllerRequest) {
 

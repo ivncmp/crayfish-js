@@ -4,6 +4,7 @@ import { AuthenticationService } from "../service/authentication-service";
 import { ControllerHttpMethod, ControllerRequest, ControllerResponse } from "../types";
 import { Utils } from "../utils";
 import { generateSwagger, SwaggerEndpoint } from "../utils/swagger";
+import { ModelData } from "./base-model";
 
 /**
  * Basic controller.
@@ -29,9 +30,22 @@ export class BaseController {
             .find((c: any) => c.isUserModel()) as BaseUserModel;
 
         if (baseUserModel) {
+
             this.authenticationService = new AuthenticationService(baseUserModel);
+
         } else {
-            class MockUserModel extends BaseUserModel { }
+
+            class MockUserModel extends BaseUserModel {
+
+                unmarshall(requestData: ControllerRequest) {
+                    throw new Error("Method not implemented.");
+                }
+
+                marshall(modelData: ModelData): ControllerRequest | undefined {
+                    throw new Error("Method not implemented.");
+                }
+            }
+
             this.authenticationService = new AuthenticationService(new MockUserModel());
         }
     }

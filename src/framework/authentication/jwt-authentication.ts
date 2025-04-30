@@ -25,6 +25,29 @@ export class JwtAuthentication implements BaseAuthentication {
     /**
      * login
      */
+    async register(request: ControllerRequest): Promise<BaseUser> {
+
+        const authConfig = getEnvironment().authConfig;
+
+        if (!authConfig || authConfig.provider !== "JWT" || !authConfig.jwt) {
+            throw Error(JSON.stringify({ code: 500, error: "CONFIGURATION_INVALID" }));
+        }
+
+        const userToSave = this.userModel.unmarshall(request.body);
+
+        userToSave.password = await bcrypt.hash(
+            request.body.password,
+            await bcrypt.genSalt(10)
+        );
+
+        return this.userModel.marshall(
+            await this.userModel.save(userToSave)
+        );
+    }
+
+    /**
+     * login
+     */
     async login(request: ControllerRequest): Promise<{ user: BaseUser, token: string }> {
 
         const authConfig = getEnvironment().authConfig;
@@ -39,21 +62,24 @@ export class JwtAuthentication implements BaseAuthentication {
             throw Error(JSON.stringify({ code: 400, error: "INVALID_PARAMETERS" }));
         }
 
-        const user = await this.userModel.findOne({ username });
+        const user = await this.userModel.findOne({ username: username });
 
         if (!user) {
             throw Error(JSON.stringify({ code: 404, error: "NOT_FOUND" }));
         }
 
-        const salt = bcrypt.genSaltSync(10);
-        const hashPassword = bcrypt.hashSync(password, salt);
+        try {
 
-        console.log(hashPassword);
+            const passwordMatch = await bcrypt.compare(password, user.password);
 
-        const passwordMatch = await bcrypt.compare(password, user.password);
+            if (!passwordMatch) {
+                throw Error(JSON.stringify({ code: 401, error: "NOT_AUTHORIZED" }));
+            }
 
-        if (!passwordMatch) {
-            throw Error(JSON.stringify({ code: 401, error: "NOT_AUTHORIZED" }));
+        } catch (error) {
+
+            CrayfishLogger.error(this, error);
+            throw Error(JSON.stringify({ code: 401, error: "AUTHENTICATION_ERROR" }));
         }
 
         try {
@@ -61,7 +87,10 @@ export class JwtAuthentication implements BaseAuthentication {
             const token = jwt.sign({ key: user.key },
                 authConfig.jwt?.secret, { expiresIn: '1h' });
 
-            return { user, token }
+            return {
+                user: this.userModel.marshall(user),
+                token
+            };
 
         } catch (error) {
 
@@ -73,13 +102,13 @@ export class JwtAuthentication implements BaseAuthentication {
     /**
      * authenticateToken
      */
-    async authenticateToken(request: ControllerRequest): Promise<BaseUser | null> {
+    async authenticateToken(request: ControllerRequest): Promise<BaseUser | undefined> {
 
         const authHeader = request.headers["authorization"];
         const token = authHeader && authHeader.split(' ')[1];
 
         if (!token) {
-            return null;
+            return undefined;
         }
 
         const authConfig = getEnvironment().authConfig;
@@ -96,7 +125,9 @@ export class JwtAuthentication implements BaseAuthentication {
                 throw Error(JSON.stringify({ code: 401, error: "INVALID_TOKEN" }));
             }
 
-            return await this.userModel.findOne({ key: user.key });
+            return this.userModel.marshall(
+                await this.userModel.findOne({ key: user.key })
+            )
 
         } catch (error) {
 

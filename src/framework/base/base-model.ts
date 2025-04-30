@@ -1,7 +1,14 @@
 /**
 * BaseModel
 */
+import { ControllerRequest } from "../types";
+
+export type ModelData = any;
+
 export abstract class BaseModel {
+
+    abstract unmarshall(modelData: ModelData): any;
+    abstract marshall(modelData: ModelData): any;
 
     /**
      * toObject

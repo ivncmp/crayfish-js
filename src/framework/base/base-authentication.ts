@@ -6,7 +6,9 @@ import { ControllerRequest } from "../types";
  */
 export interface BaseAuthentication {
 
+    register(request: ControllerRequest): Promise<BaseUser>;
+
     login(request: ControllerRequest): Promise<{ user: BaseUser, token: string }>;
 
-    authenticateToken(request: ControllerRequest): Promise<BaseUser | null>;
+    authenticateToken(request: ControllerRequest): Promise<BaseUser | undefined>;
 };

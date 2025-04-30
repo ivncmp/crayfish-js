@@ -40,6 +40,18 @@ export class AuthenticationService {
     }
 
     /**
+     * register
+     */
+    public async register(request: ControllerRequest): Promise<BaseUser> {
+
+        if (!this.authenticationActive) {
+            return BaseController.response(request, 500, { error: "CONFIGURATION_INVALID" });
+        }
+
+        return await this.authenticationActive.register(request);
+    }
+
+    /**
      * login
      */
     public async login(request: ControllerRequest): Promise<{ user: BaseUser, token: string }> {
@@ -54,7 +66,7 @@ export class AuthenticationService {
     /**
      * login
      */
-    public async authenticateToken(request: ControllerRequest): Promise<BaseUser | null> {
+    public async authenticateToken(request: ControllerRequest): Promise<BaseUser | undefined> {
 
         if (!this.authenticationActive) {
             return BaseController.response(request, 500, { error: "CONFIGURATION_INVALID" });
