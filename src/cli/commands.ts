@@ -60,6 +60,7 @@ export async function initCommand(projectName: string) {
         executeCmd("mkdir src");
         executeCmd("mkdir src/controller");
         executeCmd("mkdir src/service");
+        executeCmd("mkdir src/model");
         executeCmd("mkdir src/environments");
         executeCmd("mkdir src/types");
 
@@ -69,9 +70,16 @@ export async function initCommand(projectName: string) {
         copyTemplate(".gitignore", projectPath);
         copyTemplate("index.ts", projectPath + "/src");
         copyTemplate("environment.ts", projectPath + "/src");
+
+        copyTemplate("auth-controller.ts", projectPath + "/src/controller");
         copyTemplate("health-controller.ts", projectPath + "/src/controller");
+
+        copyTemplate("user-model.ts", projectPath + "/src/model");
+
         copyTemplate("health-service.ts", projectPath + "/src/service");
+
         copyTemplate("project-types.ts", projectPath + "/src/types");
+
         copyTemplate("production.ts", projectPath + "/src/environments");
         copyTemplate("staging.ts", projectPath + "/src/environments");
 

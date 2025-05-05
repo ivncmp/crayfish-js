@@ -1,16 +1,53 @@
-import { getRouteRegistry } from "../decorator";
+import { getModelRegistry, getRouteRegistry } from "../decorator";
+import { BaseUser, BaseUserModel } from "../base/base-user-model";
+import { AuthenticationService } from "../service/authentication-service";
 import { ControllerHttpMethod, ControllerRequest, ControllerResponse } from "../types";
 import { Utils } from "../utils";
 import { generateSwagger, SwaggerEndpoint } from "../utils/swagger";
+import { ModelData } from "./base-model";
 
 /**
  * Basic controller.
  */
 export class BaseController {
 
+    // Authentication Service bundled in the Controllers.
+
+    private authenticationService: AuthenticationService;
+
+    /**
+     * BaseController constructor
+     */
     constructor() {
 
+        // Inject the dependencies
+
         Utils.injectDependencies(this);
+
+        // Initialize the authentication.
+
+        const baseUserModel = Object.values(getModelRegistry())
+            .find((c: any) => c.isUserModel()) as BaseUserModel;
+
+        if (baseUserModel) {
+
+            this.authenticationService = new AuthenticationService(baseUserModel);
+
+        } else {
+
+            class MockUserModel extends BaseUserModel {
+
+                unmarshall(requestData: ControllerRequest) {
+                    throw new Error("Method not implemented.");
+                }
+
+                marshall(modelData: ModelData): ControllerRequest | undefined {
+                    throw new Error("Method not implemented.");
+                }
+            }
+
+            this.authenticationService = new AuthenticationService(new MockUserModel());
+        }
     }
 
     /**
@@ -136,5 +173,13 @@ export class BaseController {
         // Return it.
 
         return BaseController.response(request, 200, swagger);
+    }
+
+    /**
+     * getAuthenticationService
+     */
+    getAuthenticationService(): AuthenticationService {
+
+        return this.authenticationService
     }
 }

@@ -133,13 +133,9 @@ export async function handleRequest(data: ProviderRequest) {
 
     setEnvironment(environment);
 
-    // Import Services.
+    // Import Components.
 
-    await Utils.importServices();
-
-    // Import Controllers.
-
-    await Utils.importControllers();
+    await Utils.importComponents();
 
     // Inject Dependencies
 

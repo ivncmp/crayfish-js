@@ -28,19 +28,25 @@
     "Typescript"
   ],
   "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.796.0",
+    "aws-sdk": "^2.1692.0",
+    "bcrypt": "^5.1.1",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "fs-extra": "^11.3.0",
+    "jsonwebtoken": "^9.0.2",
     "lodash": "~4.17.21",
     "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.1",
     "@types/fs-extra": "^11.0.4",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/lodash": "^4.17.16",
     "@types/node": "^22.14.0",
+    "express": "^4.20.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3",
-    "express": "^4.20.0"
+    "typescript": "^5.8.3"
   }
 }

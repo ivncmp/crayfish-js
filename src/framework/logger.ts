@@ -26,6 +26,14 @@ export class CrayfishLogger {
     }
 
     /**
+     * warn
+     */
+    static warn(origin: LoggerOrigin | undefined, content: any) {
+
+        CrayfishLogger._log(console.warn, origin, content);
+    }
+
+    /**
      * debug
      */
     static debug(origin: LoggerOrigin | undefined, content: any) {

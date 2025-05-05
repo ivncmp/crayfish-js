@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-import { readdirSync, statSync } from "fs";
+import { readdirSync, readFileSync, statSync } from "fs";
 import { join } from "path";
 import { getInjectionRegistry, getServiceRegistry } from "./decorator";
 import { BaseService } from "./base/base-service";
@@ -50,30 +50,22 @@ export class Utils {
     }
 
     /**
-     * importServices
+     * importComponents
      */
-    static async importServices(dirPath: string = "./") {
+    static async importComponents(dirPath: string = "./") {
 
-        const files = readdirSync(dirPath)
-            .filter((f: string) => !f.includes("node_modules"));
+        function toImport(filePath: string) {
 
-        for (const file of files) {
+            const fileContents = readFileSync(filePath).toString();
 
-            const filePath = join(dirPath, file);
-            const fileStat = statSync(filePath);
-
-            if (fileStat.isDirectory()) {
-                await Utils.importServices(filePath);
-            } else if (filePath.includes('service/') && filePath.endsWith('.js')) {
-                await import(process.cwd() + "/" + filePath);
+            if (!fileContents.includes("crayfish_js")) {
+                return false;
             }
-        }
-    }
 
-    /**
-     * importControllers
-     */
-    static async importControllers(dirPath: string = "./") {
+            return fileContents.includes(".Controller)")
+                || fileContents.includes(".Service)")
+                || fileContents.includes(".Model)");
+        }
 
         const files = readdirSync(dirPath)
             .filter((f: string) => !f.includes("node_modules"));
@@ -84,8 +76,8 @@ export class Utils {
             const fileStat = statSync(filePath);
 
             if (fileStat.isDirectory()) {
-                await Utils.importControllers(filePath);
-            } else if (filePath.includes('controller/') && filePath.endsWith('.js')) {
+                await Utils.importComponents(filePath);
+            } else if (filePath.endsWith('.js') && toImport(filePath)) {
                 await import(process.cwd() + "/" + filePath);
             }
         }

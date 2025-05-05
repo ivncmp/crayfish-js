@@ -4,6 +4,23 @@
 
 export type EnvironmentType = "PRODUCTION" | "STAGING" | "LOCAL";
 
+export type AuthenticationConfiguration = {
+    provider: 'COGNITO' | 'JWT';
+    methods: ('USERNAME_AND_PASSWORD' | 'FEDERATED' | 'API-KEY')[];
+    jwt?: {
+        secret: string
+    },
+    cognito?: {
+        userPoolId: string;
+        clientId: string;
+        region: string;
+        credentials: {
+            accessKeyId: string;
+            secretAccessKey: string;
+        },
+    }
+};
+
 export class Environment {
 
     projectName: string = "Project Name";
@@ -12,6 +29,14 @@ export class Environment {
 
     name: string;
     type: EnvironmentType;
+
+    authConfig: AuthenticationConfiguration = {
+        provider: 'JWT',
+        methods: ["USERNAME_AND_PASSWORD"],
+        jwt: {
+            secret: "thisIsSecret"
+        }
+    };
 
     constructor(_name: string, _type: EnvironmentType) {
 
