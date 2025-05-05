@@ -2,7 +2,7 @@ import { BaseUser } from "../base/base-user-model";
 import { ControllerRequest } from "../types";
 
 /**
- * JwtAuthentication
+ * BaseAuthentication
  */
 export interface BaseAuthentication {
 
