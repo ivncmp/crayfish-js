@@ -29,6 +29,8 @@ export class UserModel extends BaseUserModel {
 
     unmarshall(modelData: ModelData) {
 
+        if (!modelData) { return undefined; }
+
         const user = new User();
         user.email = modelData.email;
         user.username = modelData.username;
@@ -37,6 +39,8 @@ export class UserModel extends BaseUserModel {
     }
 
     marshall(user: User) {
+
+        if (!user) { return undefined; }
 
         const cloned = JSON.parse(JSON.stringify(user));
         delete cloned.password;
@@ -59,6 +63,10 @@ export class UserModel extends BaseUserModel {
 
         if (filter.username) {
             return this.users.find(u => u.username == filter.username);
+        }
+
+        if (filter.key) {
+            return this.users.find(u => u.key == filter.key);
         }
 
         return undefined;
